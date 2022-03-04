@@ -274,7 +274,7 @@ public class KThread {
      */
     public void join() {
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
-
+	//Testing testing 123
 	Lib.assertTrue(this != currentThread);
 
     }
