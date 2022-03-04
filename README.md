@@ -11,5 +11,5 @@ Student ID 3:  <br>
 Name 4: Joseph Giovinazzo <br>
 Student ID 4: 401423 <br>
 
-Name5: Yapi Serge Hermman Jose Yapo <br>
+Name5: Yapi Serge Herman Jose Yapo <br>
 Student ID 5:  <br>
