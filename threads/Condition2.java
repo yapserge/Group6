@@ -22,6 +22,7 @@ public class Condition2 {
      */
     public Condition2(Lock conditionLock) {
 	this.conditionLock = conditionLock;
+	//waitQueue = new ThreadQueue();
     }
 
     /**
@@ -32,10 +33,12 @@ public class Condition2 {
      */
     public void sleep() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-
+	//Machine.interrupt().disable();
+	//waitQueue waits for access
 	conditionLock.release();
-
+	//KThread.sleep();
 	conditionLock.acquire();
+	//Machine.interrupt().restore();
     }
 
     /**
@@ -44,7 +47,15 @@ public class Condition2 {
      */
     public void wake() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-    }
+	//if(threadQueue is empty){
+		//Machine.interrupt().disable();
+		//KThread thread = nextThread;
+			//if(thread is null){
+				//thread is ready
+			//}
+		//Machine.interrupt().restore();
+		//}
+	}
 
     /**
      * Wake up all threads sleeping on this condition variable. The current
@@ -52,7 +63,14 @@ public class Condition2 {
      */
     public void wakeAll() {
 	Lib.assertTrue(conditionLock.isHeldByCurrentThread());
-    }
-
+    	//if(threadQueue is empty){
+		//Machine.interrupt().disable();
+		//while(waitQueue is not empty){
+			//wake up thread;
+			//}	
+		//Machine.interrupt().restore();
+		//}
+	}
+	//private ThreadQueue waitQueue
     private Lock conditionLock;
 }
