@@ -190,10 +190,17 @@ public class KThread {
 
 	Lib.assertTrue(toBeDestroyed == null);
 	toBeDestroyed = currentThread;
-
+	//if(Jqueue is not empty){
+		//for(every item in JQueue){
+			//if (JQueue thread equals currentThread){
+				//JQueue.dequeue();
+				//break;
+			//}
+		//increment item index;
+		//}
+	//}
 
 	currentThread.status = statusFinished;
-	
 	sleep();
     }
 
@@ -274,9 +281,14 @@ public class KThread {
      */
     public void join() {
 	Lib.debug(dbgThread, "Joining to thread: " + toString());
-	//Testing testing 123
 	Lib.assertTrue(this != currentThread);
-	//Test again, for good measure
+	//if (thisThread is finished)
+	//return
+	//else {
+	//add thisThread to jQueue
+	//Machine.interrupt().disable;
+	//currentThread.sleep();
+	//}
     }
 
     /**
@@ -405,7 +417,9 @@ public class KThread {
 	
 	new KThread(new PingTest(1)).setName("forked thread").fork();
 	new PingTest(0).run();
-    }
+    	//Todo: Add a few test cases
+
+	}
 
     private static final char dbgThread = 't';
 
