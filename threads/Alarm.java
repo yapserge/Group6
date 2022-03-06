@@ -2,6 +2,9 @@ package nachos.threads;
 
 import nachos.machine.*;
 
+//private static ThreadQueue waitQueue = 0;
+// private boolean status = 0;
+
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
  * until a certain time.
@@ -27,6 +30,12 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
+	//Machine.interrupt().disable();
+	//waitingThread alarm;
+		//while(top alarm thread != null && wakeTime >= currentTime){
+		//waitQueue.ready();
+		//}
+	//Machine.interrupt().restore();
 	KThread.currentThread().yield();
     }
 
@@ -47,7 +56,33 @@ public class Alarm {
     public void waitUntil(long x) {
 	// for now, cheat just to get something working (busy waiting is bad)
 	long wakeTime = Machine.timer().getTime() + x;
+	
+	//KThread thread = currentThread();
+	//waitingThread alarm;
+	//alarm.add(wakeTime);
+
+	//Machine.interrupt().disable();
+	//thread.sleep();
+	//Machine.interrupt().restore();
+
 	while (wakeTime > Machine.timer().getTime())
 	    KThread.yield();
     }
+
+	//public class waitingThread{
+	//conditionLock lock;
+	//LinkedList <Object> linked;
+
+	//waitingThread(KThread thread, wakeTime time){
+		//this.thread = thread;
+		//this.time = time;
+		//}
+	//private compareTo(waitingThread thread){
+	//private void add(KThread thread){
+		//if(lock != currentThread){
+			//lock.acquire();
+		//}
+		//linked.add(thread);
+		//lock.release();
+		//}
 }
