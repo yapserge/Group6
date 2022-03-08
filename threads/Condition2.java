@@ -71,6 +71,46 @@ public class Condition2 {
 	* Gets the thread count and returns it
 	* Used in Communicator
 	*/
+	
+	public static void selfTest(){
+		
+		System.out.println("Testing Condition 2:");
+		
+		final Lock lock = new Lock();
+		final Condition2 con2 = new Condition2(lock);
+		
+		KThread sleep = new KThread(new Runnable(){
+			public void run(){
+				
+				lock.acquire();
+				
+				System.out.println("Sleep:");
+				System.out.println("Going to sleep...");
+				con2.sleep();
+				System.out.println("PASS: Thread awake!");
+				lock.release();
+			}
+			
+			
+		});
+		sleep.fork();
+		
+		KThread wake =	new KThread(new Runnable()
+		{
+		//Test 2: Wake
+           public void run()
+           {
+        	   lock.acquire();
+        	   System.out.println("Wake:"); 
+               System.out.println("...Waking a thread...\n");
+               con2.wake();      
+				System.out.println("PASS: Wake up succesful!");
+				lock.release();
+       } } );
+		wake.fork();
+		sleep.join();
+		
+	}
 
     public int getThreadCount() {
         return count;
