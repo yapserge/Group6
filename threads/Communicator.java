@@ -14,6 +14,7 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
+    	inTrans = false;
     }
 
     /**
@@ -27,6 +28,14 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
+    	conditionLock.acquire();
+    		while(inTrans || listenQueue.getThreadCount() == 0) {
+    			speakQueue.sleep();
+    		}
+    		inTrans = true;
+    		int message = word;
+    		listenQueue.wake();
+    		conditionLock.release();
     }
 
     /**
@@ -36,6 +45,27 @@ public class Communicator {
      * @return	the integer transferred.
      */    
     public int listen() {
-	return 0;
+    	int listened;
+    	conditionLock.acquire();
+    		while(!inTrans) {
+    			if(speakQueue.getThreadCount()>0) {
+    				speakQueue.wake();
+    				listenQueue.sleep();
+    			}
+    		}
+    		listened = message;
+    		inTrans = false;
+    		if(listenQueue.getThreadCount() > 0 && speakQueue.getThreadCount() > 0)
+    			speakQueue.wake();
+    		
+    		conditionLock.release();
+    		return listened;
     }
+    
+    private Lock conditionLock = new Lock();
+    private Condition2 speakQueue = new Condition2(conditionLock);
+    private Condition2 listenQueue = new Condition2(conditionLock);
+    private int message;
+    private boolean inTrans;
 }
+
