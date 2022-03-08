@@ -74,7 +74,7 @@ public class Condition2 {
 	
 	public static void selfTest(){
 		
-		System.out.println("Testing Condition 2:");
+		System.out.println("\nTesting Condition 2:");
 		
 		final Lock lock = new Lock();
 		final Condition2 con2 = new Condition2(lock);
@@ -102,7 +102,7 @@ public class Condition2 {
            {
         	   lock.acquire();
         	   System.out.println("Wake:"); 
-               System.out.println("...Waking a thread...\n");
+               System.out.println("...Waking a thread...");
                con2.wake();      
 				System.out.println("PASS: Wake up succesful!");
 				lock.release();

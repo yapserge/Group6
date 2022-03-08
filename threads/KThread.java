@@ -447,7 +447,7 @@ public class KThread {
 	
 		new KThread(new PingTest(1)).setName("forked thread").fork();
 		new PingTest(0).run();
-		System.out.println("Testing join:");
+		System.out.println("Testing KThread self-join:");
 		Test();
 
 	}
@@ -467,7 +467,7 @@ public class KThread {
     					Stest = "PASS";
     				}
     				System.out.print(Stest);
-    				System.out.print(": Failed at joining to self.\n");
+    				System.out.print(": Failed to join to self.\n");
     		}
     	});
     	
