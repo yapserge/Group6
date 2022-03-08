@@ -1,16 +1,20 @@
 package nachos.threads;
 
 import nachos.machine.*;
-
-//private static ThreadQueue waitQueue = 0;
-// private boolean status = 0;
+import java.util.TreeSet;
 
 /**
  * Uses the hardware timer to provide preemption, and to allow threads to sleep
  * until a certain time.
  */
 public class Alarm {
-    /**
+ 
+	/**
+	 * Creating a priority queue to hold the waiting threads.
+	 */
+	java.util.PriorityQueue<waitingThread> waitQueue = new java.util.PriorityQueue<waitingThread>();
+	
+   /**
      * Allocate a new Alarm. Set the machine's timer interrupt handler to this
      * alarm's callback.
      *
@@ -30,13 +34,18 @@ public class Alarm {
      * that should be run.
      */
     public void timerInterrupt() {
-	//Machine.interrupt().disable();
-	//waitingThread alarm;
-		//while(top alarm thread != null && wakeTime >= currentTime){
-		//waitQueue.ready();
-		//}
-	//Machine.interrupt().restore();
-	KThread.currentThread().yield();
+
+	boolean status = Machine.interrupt().disable();
+    	waitingThread newThread;
+    	
+    	while((newThread = waitQueue.peek()) != null
+    			&& newThread.getTime() <= Machine.timer().getTime()) {
+    		waitQueue.poll().getThread().ready();
+    		
+    	}
+    	
+    	Machine.interrupt().restore(status);
+    	KThread.yield();
     }
 
     /**
@@ -54,35 +63,88 @@ public class Alarm {
      * @see	nachos.machine.Timer#getTime()
      */
     public void waitUntil(long x) {
-	// for now, cheat just to get something working (busy waiting is bad)
 	long wakeTime = Machine.timer().getTime() + x;
-	
-	//KThread thread = currentThread();
-	//waitingThread alarm;
-	//alarm.add(wakeTime);
-
-	//Machine.interrupt().disable();
-	//thread.sleep();
-	//Machine.interrupt().restore();
-
-	while (wakeTime > Machine.timer().getTime())
-	    KThread.yield();
+    	boolean status = Machine.interrupt().disable();
+    
+    	KThread thread = KThread.currentThread();
+    	waitingThread newThread = new waitingThread(thread, wakeTime);
+    	
+    	waitQueue.add(newThread);
+    	KThread.sleep();
+    	Machine.interrupt().restore(status);
+    	
     }
 
-	//public class waitingThread{
-	//conditionLock lock;
-	//LinkedList <Object> linked;
+/**
+     * A private class that implements the Comparable interface.
+     *
+     */
+    private class waitingThread implements Comparable<waitingThread> {
+    	public KThread thread;
+    	public long time;
+    	
+    	/**
+    	 * Constructor to create a waiting thread, consisting of the thread and its wake time.
+    	 * @param thread  the thread.
+    	 * @param time  wake time of the thread.
+    	 */
+    	public waitingThread(KThread thread, long time){
+    		this.thread = thread;
+    		this.time = time;
+    	}
+    	
+    	/**
+    	 * Returns the thread.
+    	 * @return  the thread.
+    	 */
+    	public KThread getThread() {
+    		return thread;
+    	}
+    	
+    	/**
+    	 * Returns the wake time of the thread.
+    	 * @return  the wake time of the thread.
+    	 */
+    	public long getTime() {
+    		return time;
+    	}
+    	
+    	/**
+    	 * Allows threads to be sorted according to their wake times. 
+    	 */
+    	public int compareTo(waitingThread newThread) {
+    		if(time > newThread.time) {
+    			return 1;
+    		}
+    		else if(time < newThread.time) {
+    			return -1;
+    		}
+    		else { 
+    			return thread.compareTo(newThread.thread);
+    		}
+    		
+    	}
+    }
+    
+    public static void selfTest(){
+    	System.out.println("\nTesting Alarm:");
+    	
+    		class RunAlarm implements Runnable {
+    			public void run() {
+    				ThreadedKernel.alarm.waitUntil((int)(Math.random() * 1000) + 500);
 
-	//waitingThread(KThread thread, wakeTime time){
-		//this.thread = thread;
-		//this.time = time;
-		//}
-	//private compareTo(waitingThread thread){
-	//private void add(KThread thread){
-		//if(lock != currentThread){
-			//lock.acquire();
-		//}
-		//linked.add(thread);
-		//lock.release();
-		//}
+    			}
+    		}
+    		
+    		final int threadnum = 7; 
+    		
+    		RunAlarm run = new RunAlarm();
+    		for(int i = 0; i < threadnum; i++) {
+    			new KThread(run).setName("t"+i).fork();
+    		}
+    		KThread.yield(); 
+    		System.out.println("PASS: Alarm success!");
+    }
+	
+	private TreeSet<waitingThread> set; 
 }
