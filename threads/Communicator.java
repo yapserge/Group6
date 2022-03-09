@@ -75,7 +75,7 @@ public class Communicator {
 		test4.fork();
 		test5.fork();
 		
-		System.out.println("\nCommunicator Test:");
+		System.out.println("\nTesting Communicator:");
 		new Test(0).run();
 	}
 	

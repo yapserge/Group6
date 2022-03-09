@@ -52,12 +52,11 @@ public class ThreadedKernel extends Kernel {
 	Condition2.selfTest();
 	Alarm.selfTest();
 	Communicator.selfTest();
-	//WaterReact.selfTest();
-	
+	ReactWater.selfTest();
 	
 	if (Machine.bank() != null) {
 	    ElevatorBank.selfTest();
-	}
+		}
     }
     
     /**
@@ -65,6 +64,7 @@ public class ThreadedKernel extends Kernel {
      * nothing.
      */
     public void run() {
+    	
     }
 
     /**
