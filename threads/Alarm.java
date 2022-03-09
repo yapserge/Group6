@@ -128,23 +128,63 @@ public class Alarm {
     
     public static void selfTest(){
     	System.out.println("\nTesting Alarm:");
-    	
-    		class RunAlarm implements Runnable {
-    			public void run() {
-    				ThreadedKernel.alarm.waitUntil((int)(Math.random() * 1000) + 500);
-
-    			}
-    		}
-    		
-    		final int threadnum = 7; 
-    		
-    		RunAlarm run = new RunAlarm();
-    		for(int i = 0; i < threadnum; i++) {
-    			new KThread(run).setName("t"+i).fork();
-    		}
-    		KThread.yield(); 
-    		System.out.println("PASS: Alarm success!");
-    }
+    	final Alarm alarm = new Alarm();
+		
+		Runnable A = new Runnable() {
+			public void run() {
+				long current = Machine.timer().getTime();
+				alarm.waitUntil(750);
+				if ((Machine.timer().getTime() >= (current + 750)) 
+				    && (Machine.timer().getTime() < (current + 1500))){
+					System.out.println("Test1 -  Success!");
+					}
+				else {
+					System.out.println("Test1 -  Failure!");
+					}
+				System.out.println("Test1 Should Display First");
+				}
+			};
+		
+		Runnable B = new Runnable() {
+			public void run() {
+				long current = Machine.timer().getTime();
+				alarm.waitUntil(2500);
+				if ((Machine.timer().getTime() >= (current + 2500)) 
+				    && (Machine.timer().getTime() < (current + 3000))){
+					System.out.println("Test2 -  Success!");
+					}
+				else {
+					System.out.println("Test2 -  Failure!");
+					}
+				System.out.println("Test2 Should Display Last");
+				}
+			};
+		
+		Runnable C = new Runnable() {
+			public void run() {
+				long current = Machine.timer().getTime();
+				alarm.waitUntil(1500);
+				if ((Machine.timer().getTime() >= (current + 1500)) 
+				    && (Machine.timer().getTime() < (current + 2000))){
+					System.out.println("Test3 - Success!");
+					}
+				else {
+					System.out.println("Test3 - Failure!");
+					}
+				System.out.println("Test3 Should Display Second");
+				}
+			};
+		
+		KThread Test1 = new KThread(A);
+		KThread Test2 = new KThread(B);
+		KThread Test3 = new KThread(C);
+		Test1.fork();
+		Test2.fork();
+		Test3.fork();
+		Test1.join();
+		Test2.join();
+		Test3.join();
+	}
 	
 	private TreeSet<waitingThread> set; 
 }
