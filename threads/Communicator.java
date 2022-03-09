@@ -14,6 +14,9 @@ public class Communicator {
      * Allocate a new communicator.
      */
     public Communicator() {
+    	this.conditionLock = new Lock();
+    	this.speakQueue = new Condition2(conditionLock);
+    	this.listenQueue = new Condition2(conditionLock);
     	inTrans = false;
     }
 
@@ -28,14 +31,14 @@ public class Communicator {
      * @param	word	the integer to transfer.
      */
     public void speak(int word) {
-    	conditionLock.acquire();
-    		while(inTrans || listenQueue.getThreadCount() == 0) {
-    			speakQueue.sleep();
+    	this.conditionLock.acquire();
+    		while(inTrans) {
+    			this.speakQueue.sleep();
     		}
-    		inTrans = true;
-    		int message = word;
-    		listenQueue.wake();
-    		conditionLock.release();
+    		this.message = word;
+    		this.inTrans = true;
+    		this.listenQueue.wake();
+    		this.conditionLock.release();
     }
 
     /**
@@ -45,21 +48,71 @@ public class Communicator {
      * @return	the integer transferred.
      */    
     public int listen() {
-    	int listened;
-    	conditionLock.acquire();
+    	int listened = message;
+    	this.conditionLock.acquire();
     		while(!inTrans) {
-    			if(speakQueue.getThreadCount()>0) {
-    				speakQueue.wake();
-    				listenQueue.sleep();
-    			}
+    				this.listenQueue.sleep();
     		}
-    		listened = message;
     		inTrans = false;
-    		if(listenQueue.getThreadCount() > 0 && speakQueue.getThreadCount() > 0)
-    			speakQueue.wake();
+    		this.speakQueue.wakeAll();
     		
-    		conditionLock.release();
+    		this.conditionLock.release();
     		return listened;
+    }
+    
+    public static void selfTest()
+	{
+		KThread test1 = new KThread(new Test(1));
+		KThread test2 = new KThread(new Test(2));
+		KThread test3 = new KThread(new Test(3));
+		KThread test4 = new KThread(new Test(4));
+		KThread test5 = new KThread(new Test(5));
+		
+
+		test1.fork();
+		test2.fork();
+		test3.fork();
+		test4.fork();
+		test5.fork();
+		
+		System.out.println("\nCommunicator Test:");
+		new Test(0).run();
+	}
+	
+public static class Test implements Runnable
+{
+
+ private int ID;
+ private static Communicator com = new Communicator();
+ 
+	Test(int ID) 
+	{
+	    this.ID = ID;
+	}
+	
+
+	public void run() {
+	    if (ID == 0) 
+	    {
+	        for (int i = 0; i < 5; i++) 
+	        {
+	            System.out.println("Test " + ID + " Speak(" + i + ")");
+	            com.speak(i);
+	        }
+	    }
+	    else 
+	    {
+	        for (int i = 0; i < 5; i++) 
+	        {
+	            System.out.println("Test " +ID + " listening to... " + i);
+	            int transfered = com.listen();
+	            System.out.println("Test " + ID + " heard word " + transfered);
+	        }
+	    }
+	    	ThreadedKernel.alarm.waitUntil(2000);
+	    	System.out.println("PASS: Communicator Success!");
+	
+		}
     }
     
     private Lock conditionLock = new Lock();
