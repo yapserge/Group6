@@ -447,7 +447,7 @@ public class KThread {
 	
 		new KThread(new PingTest(1)).setName("forked thread").fork();
 		new PingTest(0).run();
-		System.out.println("Testing KThread self-join:");
+		System.out.println("\nTesting KThread self-join:");
 		Test();
 
 	}
@@ -471,8 +471,8 @@ public class KThread {
     		}
     	});
     	
-    	test.fork();		//Testing the fork
-    	test.join();		//Testing the join
+    	test.fork();		
+    	test.join();		
     		
     	}
 
