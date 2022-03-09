@@ -72,7 +72,7 @@ public class ReactWater{
      *   Print out the message of "water was made!".
      **/
     public void Makewater() {
-    	System.out.println("Water was made!");
+    	System.out.println("PASS: Water was made!");
     } 
     
     public static void selfTest(){
@@ -103,6 +103,5 @@ public class ReactWater{
     test1.join();
     test2.join();
     test3.join();
-    System.out.println("ReactWater Success!");
     }
 }

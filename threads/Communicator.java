@@ -60,59 +60,36 @@ public class Communicator {
     		return listened;
     }
     
-    public static void selfTest()
-	{
-		KThread test1 = new KThread(new Test(1));
-		KThread test2 = new KThread(new Test(2));
-		KThread test3 = new KThread(new Test(3));
-		KThread test4 = new KThread(new Test(4));
-		KThread test5 = new KThread(new Test(5));
-		
-
-		test1.fork();
-		test2.fork();
-		test3.fork();
-		test4.fork();
-		test5.fork();
-		
-		System.out.println("\nTesting Communicator:");
-		new Test(0).run();
-	}
-	
-public static class Test implements Runnable
-{
-
- private int ID;
- private static Communicator com = new Communicator();
+    public static void selfTest(){
+        	
+    		System.out.println("\nTesting Communicator:");
+        	final Communicator communicator = new Communicator();	
+    		
+        	Runnable A = new Runnable(){
+        		
+        		public void run(){
+        			System.out.println("Speaking... Awaiting Verification!");
+        			communicator.speak(5);
+        			System.out.println("No longer speaking...");
+        		}
+        	};
+        	
+        	Runnable B = new Runnable(){
+        		public void run(){
+        			System.out.println("Listening... Awaiting verification.");
+        			int x = communicator.listen();
+        			System.out.println("No longer listening... Is this your word?: " + x);
+        		}
+        	};
+        	
+        	KThread Test1 = new KThread(A);
+        	KThread Test2 = new KThread(B);
+    		Test1.fork();
+    		Test2.fork();
+    		Test1.join();
+    		Test2.join();
+        	
  
-	Test(int ID) 
-	{
-	    this.ID = ID;
-	}
-	
-
-	public void run() {
-	    if (ID == 0) 
-	    {
-	        for (int i = 0; i < 5; i++) 
-	        {
-	            System.out.println("Test " + ID + " Speak(" + i + ")");
-	            com.speak(i);
-	        }
-	    }
-	    else 
-	    {
-	        for (int i = 0; i < 5; i++) 
-	        {
-	            System.out.println("Test " +ID + " listening to... " + i);
-	            int transfered = com.listen();
-	            System.out.println("Test " + ID + " heard word " + transfered);
-	        }
-	    }
-	    	ThreadedKernel.alarm.waitUntil(2000);
-	    	System.out.println("PASS: Communicator Success!");
-	
-		}
     }
     
     private Lock conditionLock = new Lock();
